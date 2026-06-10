@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orbits — Quality Engineering & Technology Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #020917;
+    --navy-2: #061428;
+    --navy-3: #0a1f3d;
+    --teal: #00d4c8;
+    --teal-dim: #00a89e;
+    --teal-glow: rgba(0, 212, 200, 0.15);
+    --teal-glow-strong: rgba(0, 212, 200, 0.3);
+    --white: #f0f6ff;
+    --gray: #8899bb;
+    --gray-light: #c8d8f0;
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  .cursor {
+    width: 10px; height: 10px;
+    background: var(--teal);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid var(--teal);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s;
+    opacity: 0.5;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 24px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(0,212,200,0.08);
+    backdrop-filter: blur(20px);
+    background: rgba(2,9,23,0.7);
+    transition: all 0.3s ease;
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-orbit { width: 28px; height: 28px; position: relative; display: inline-block; }
+  .logo-orbit svg { width: 100%; height: 100%; }
+
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+
+  .nav-links a {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray);
+    text-decoration: none;
+    transition: color 0.3s;
+    position: relative;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--teal);
+    transition: width 0.3s ease;
+  }
+
+  .nav-links a:hover { color: var(--teal); }
+  .nav-links a:hover::after { width: 100%; }
+
+  .nav-cta {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy);
+    background: var(--teal);
+    padding: 10px 24px;
+    border-radius: 2px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px var(--teal-glow-strong);
+  }
+
+  .nav-cta:hover {
+    background: var(--white);
+    box-shadow: 0 0 30px var(--teal-glow-strong);
+    transform: translateY(-1px);
+  }
+
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 120px 60px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .orbital-bg {
+    position: absolute;
+    right: -100px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 700px;
+    height: 700px;
+    pointer-events: none;
+  }
+
+  .orbital-bg svg { width: 100%; height: 100%; animation: slowRotate 40s linear infinite; }
+
+  @keyframes slowRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .orbital-dot { animation: orbitDot 8s linear infinite; transform-origin: 350px 350px; }
+  .orbital-dot-2 { animation: orbitDot 14s linear infinite reverse; transform-origin: 350px 350px; }
+  .orbital-dot-3 { animation: orbitDot 20s linear infinite; transform-origin: 350px 350px; }
+
+  @keyframes orbitDot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .hero-glow {
+    position: absolute;
+    right: 200px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--teal-glow) 0%, transparent 70%);
+    pointer-events: none;
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.6; transform: translateY(-50%) scale(1); }
+    50% { opacity: 1; transform: translateY(-50%) scale(1.1); }
+  }
+
+  .hero-content { max-width: 680px; position: relative; z-index: 2; }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--teal);
+    border: 1px solid rgba(0,212,200,0.3);
+    padding: 6px 14px;
+    border-radius: 2px;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.2s;
+  }
+
+  .hero-tag::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--teal);
+    border-radius: 50%;
+    animation: blink 2s ease infinite;
+  }
+
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(48px, 6vw, 80px);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.4s;
+  }
+
+  h1 .teal { color: var(--teal); }
+  h1 .outline { -webkit-text-stroke: 1px var(--teal); color: transparent; }
+
+  .hero-sub {
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--gray-light);
+    max-width: 520px;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.6s;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.8s;
+  }
+
+  .btn-primary {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy);
+    background: var(--teal);
+    padding: 14px 32px;
+    border-radius: 2px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 30px var(--teal-glow-strong);
+  }
+
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 50px var(--teal-glow-strong); }
+
+  .btn-secondary {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-light);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s;
+  }
+
+  .btn-secondary:hover { color: var(--teal); }
+  .btn-secondary .arrow { transition: transform 0.3s; }
+  .btn-secondary:hover .arrow { transform: translateX(4px); }
+
+  /* STATS BAR */
+  .stats-bar {
+    background: rgba(0,212,200,0.04);
+    border-top: 1px solid rgba(0,212,200,0.1);
+    border-bottom: 1px solid rgba(0,212,200,0.1);
+    padding: 32px 60px;
+    display: flex;
+    gap: 0;
+  }
+
+  .stat {
+    flex: 1;
+    padding: 0 40px;
+    border-right: 1px solid rgba(0,212,200,0.1);
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  .stat:nth-child(1) { animation-delay: 0.1s; padding-left: 0; }
+  .stat:nth-child(2) { animation-delay: 0.2s; }
+  .stat:nth-child(3) { animation-delay: 0.3s; }
+  .stat:nth-child(4) { animation-delay: 0.4s; border-right: none; }
+
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--teal);
+    display: block;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+
+  section { padding: 100px 60px; position: relative; }
+
+  .section-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-tag::before { content: ''; width: 30px; height: 1px; background: var(--teal); }
+
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(32px, 4vw, 52px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+
+  .section-sub {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--gray-light);
+    max-width: 540px;
+    margin-bottom: 64px;
+  }
+
+  /* SERVICES */
+  #services { background: var(--navy-2); }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(0,212,200,0.08);
+    border: 1px solid rgba(0,212,200,0.08);
+  }
+
+  .service-card {
+    background: var(--navy-2);
+    padding: 48px 40px;
+    transition: background 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--teal);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+
+  .service-card:hover::before { transform: scaleX(1); }
+  .service-card:hover { background: rgba(0,212,200,0.04); }
+
+  .service-icon {
+    width: 48px; height: 48px;
+    border: 1px solid rgba(0,212,200,0.3);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    color: var(--teal);
+    font-size: 20px;
+    transition: all 0.3s;
+  }
+
+  .service-card:hover .service-icon {
+    background: var(--teal-glow);
+    border-color: var(--teal);
+    box-shadow: 0 0 20px var(--teal-glow);
+  }
+
+  .service-card h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 19px;
+    margin-bottom: 14px;
+    letter-spacing: -0.01em;
+  }
+
+  .service-card p { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--gray); }
+
+  .service-card .tag-list { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .tag {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    border: 1px solid rgba(0,212,200,0.2);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+
+  /* EXPERIENCE SECTION */
+  #experience { padding: 100px 60px; }
+
+  .experience-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-top: 16px;
+  }
+
+  .exp-card {
+    background: var(--navy-2);
+    border: 1px solid rgba(0,212,200,0.1);
+    border-radius: 4px;
+    padding: 40px;
+    position: relative;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .exp-card:hover {
+    border-color: rgba(0,212,200,0.3);
+    transform: translateY(-4px);
+  }
+
+  .exp-card .exp-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .exp-card h3 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .exp-card .exp-meta {
+    font-size: 13px;
+    color: var(--gray);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .exp-card p {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--gray-light);
+    margin-bottom: 20px;
+  }
+
+  .exp-card .tag-list { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .exp-card.featured {
+    grid-column: 1 / -1;
+    border-color: rgba(0,212,200,0.25);
+    background: linear-gradient(135deg, rgba(0,212,200,0.06) 0%, var(--navy-2) 60%);
+  }
+
+  .exp-card.featured::before {
+    content: 'LEAD EXPERIENCE';
+    position: absolute;
+    top: -1px; right: 32px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--navy);
+    background: var(--teal);
+    padding: 4px 14px;
+    border-radius: 0 0 4px 4px;
+  }
+
+  .exp-card.featured .exp-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .exp-highlights {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .highlight-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--gray-light);
+    line-height: 1.5;
+  }
+
+  .highlight-item::before {
+    content: '▸';
+    color: var(--teal);
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 11px;
+  }
+
+  /* ABOUT */
+  #about {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+    align-items: center;
+    padding: 100px 60px;
+    background: var(--navy-2);
+  }
+
+  .about-visual { position: relative; height: 440px; }
+
+  .about-card {
+    position: absolute;
+    background: var(--navy);
+    border: 1px solid rgba(0,212,200,0.12);
+    border-radius: 4px;
+    padding: 28px;
+  }
+
+  .about-card-main { top: 0; left: 0; right: 80px; bottom: 100px; }
+
+  .about-card-accent {
+    bottom: 0; right: 0;
+    width: 220px;
+    border-color: rgba(0,212,200,0.3);
+    background: rgba(0,212,200,0.04);
+  }
+
+  .about-card-main h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: var(--teal);
+  }
+
+  .check-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+
+  .check-list li {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--gray-light);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+
+  .check-list li::before { content: '▸'; color: var(--teal); flex-shrink: 0; margin-top: 1px; }
+
+  .about-card-accent .accent-number {
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--teal);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .about-card-accent p { font-size: 13px; color: var(--gray); font-weight: 300; line-height: 1.5; }
+
+  .about-content p {
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--gray-light);
+    margin-bottom: 20px;
+  }
+
+  /* PROCESS */
+  #process { padding: 100px 60px; }
+
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 64px;
+    position: relative;
+  }
+
+  .process-steps::before {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--teal), transparent);
+    opacity: 0.3;
+  }
+
+  .step { padding: 0 24px; text-align: center; }
+
+  .step-num {
+    width: 56px; height: 56px;
+    border: 1px solid rgba(0,212,200,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--teal);
+    background: var(--navy);
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s;
+  }
+
+  .step:hover .step-num {
+    background: var(--teal-glow);
+    border-color: var(--teal);
+    box-shadow: 0 0 20px var(--teal-glow);
+  }
+
+  .step h3 { font-family: var(--font-display); font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+  .step p { font-size: 13px; font-weight: 300; line-height: 1.7; color: var(--gray); }
+
+  /* CONTACT */
+  #contact { background: var(--navy-2); padding: 100px 60px; }
+
+  .contact-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+
+  .contact-info p { font-size: 15px; font-weight: 300; line-height: 1.8; color: var(--gray-light); margin-bottom: 40px; }
+
+  .contact-detail { display: flex; flex-direction: column; gap: 16px; }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 14px;
+    color: var(--gray-light);
+  }
+
+  .contact-item .icon {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(0,212,200,0.2);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--teal);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .contact-form { display: flex; flex-direction: column; gap: 20px; }
+
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+
+  .form-group label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(0,212,200,0.15);
+    border-radius: 2px;
+    padding: 14px 16px;
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.3s, background 0.3s;
+    width: 100%;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: var(--teal);
+    background: rgba(0,212,200,0.04);
+  }
+
+  .form-group textarea { resize: vertical; min-height: 120px; }
+  .form-group select option { background: var(--navy-2); }
+
+  .form-submit {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy);
+    background: var(--teal);
+    border: none;
+    padding: 16px 32px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 20px var(--teal-glow);
+    align-self: flex-start;
+  }
+
+  .form-submit:hover { transform: translateY(-2px); box-shadow: 0 0 40px var(--teal-glow-strong); }
+
+  footer {
+    padding: 32px 60px;
+    border-top: 1px solid rgba(0,212,200,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  footer .logo { font-size: 18px; }
+  footer p { font-size: 12px; color: var(--gray); letter-spacing: 0.05em; }
+
+  .footer-links { display: flex; gap: 28px; list-style: none; }
+
+  .footer-links a {
+    font-size: 12px;
+    color: var(--gray);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    transition: color 0.3s;
+  }
+
+  .footer-links a:hover { color: var(--teal); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 1024px) {
+    nav { padding: 20px 32px; }
+    .hero, section, #about, #contact, #experience { padding: 80px 32px; }
+    .stats-bar { padding: 32px; }
+    .services-grid { grid-template-columns: 1fr 1fr; }
+    #about { grid-template-columns: 1fr; gap: 48px; }
+    .about-visual { height: 320px; }
+    .experience-grid { grid-template-columns: 1fr; }
+    .exp-card.featured .exp-content { grid-template-columns: 1fr; }
+    .process-steps { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .contact-inner { grid-template-columns: 1fr; gap: 48px; }
+    footer { padding: 24px 32px; flex-direction: column; gap: 16px; text-align: center; }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 20px 60px; }
+    .orbital-bg, .hero-glow { display: none; }
+    .stats-bar { padding: 24px 20px; flex-direction: column; gap: 24px; }
+    .stat { border-right: none; border-bottom: 1px solid rgba(0,212,200,0.1); padding: 0 0 24px; }
+    .stat:last-child { border-bottom: none; padding-bottom: 0; }
+    section, #about, #contact, #experience { padding: 60px 20px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .process-steps { grid-template-columns: 1fr; }
+    .process-steps::before { display: none; }
+    footer { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-orbit">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="18" stroke="#00d4c8" stroke-width="1" stroke-dasharray="4 3" opacity="0.4"/>
+        <circle cx="20" cy="20" r="11" stroke="#00d4c8" stroke-width="1" opacity="0.6"/>
+        <circle cx="20" cy="20" r="4" fill="#00d4c8"/>
+        <circle cx="20" cy="9" r="2.5" fill="#00d4c8" opacity="0.9"/>
+        <circle cx="31" cy="20" r="1.8" fill="#00d4c8" opacity="0.5"/>
+      </svg>
+    </div>
+    ORBITS
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#process">Process</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get in Touch</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="orbital-bg">
+    <svg viewBox="0 0 700 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="350" cy="350" r="280" stroke="#00d4c8" stroke-width="0.5" stroke-dasharray="6 4" opacity="0.2"/>
+      <circle cx="350" cy="350" r="200" stroke="#00d4c8" stroke-width="0.5" opacity="0.15"/>
+      <circle cx="350" cy="350" r="120" stroke="#00d4c8" stroke-width="0.5" stroke-dasharray="3 3" opacity="0.25"/>
+      <circle cx="350" cy="350" r="50" fill="rgba(0,212,200,0.08)" stroke="#00d4c8" stroke-width="1" opacity="0.6"/>
+      <circle cx="350" cy="350" r="12" fill="#00d4c8" opacity="0.8"/>
+      <g class="orbital-dot"><circle cx="350" cy="70" r="6" fill="#00d4c8"/></g>
+      <g class="orbital-dot-2"><circle cx="550" cy="350" r="4" fill="#00d4c8" opacity="0.6"/></g>
+      <g class="orbital-dot-3"><circle cx="350" cy="150" r="3" fill="#00d4c8" opacity="0.4"/></g>
+    </svg>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-tag">Quality Engineering & Technology Consulting</div>
+    <h1>
+      Where <span class="teal">Precision</span><br>
+      Meets <span class="outline">Innovation</span>
+    </h1>
+    <p class="hero-sub">
+      Senior QA consulting for healthcare AI platforms, insurance technology, and regulated software — backed by 10+ years of hands-on experience in some of the most complex, high-stakes environments in US healthcare.
+    </p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">Start a Project</a>
+      <a href="#experience" class="btn-secondary">Our Experience <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat">
+    <span class="stat-number">10+</span>
+    <span class="stat-label">Years in Healthcare QA</span>
+  </div>
+  <div class="stat">
+    <span class="stat-number">4</span>
+    <span class="stat-label">Years on FDA-Cleared AI Platform</span>
+  </div>
+  <div class="stat">
+    <span class="stat-number">350+</span>
+    <span class="stat-label">Dental Procedure Codes Tested</span>
+  </div>
+  <div class="stat">
+    <span class="stat-number">CMS</span>
+    <span class="stat-label">Federal Marketplace QA Background</span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-tag">What We Do</div>
+  <h2>Services Built for<br><span style="color:var(--teal)">Complex Systems</span></h2>
+  <p class="section-sub">From AI product validation to full QA strategy, we bring senior-level expertise and deep healthcare domain knowledge to every engagement.</p>
+
+  <div class="services-grid">
+    <div class="service-card fade-up">
+      <div class="service-icon">⬡</div>
+      <h3>AI & ML Product Testing</h3>
+      <p>Validate AI model outputs against business logic, payer-specific decision rules, and regulatory requirements. Deep experience with healthcare AI platforms where clinical accuracy is non-negotiable.</p>
+      <div class="tag-list">
+        <span class="tag">ML Validation</span>
+        <span class="tag">Logic Tree QA</span>
+        <span class="tag">DB + UI Validation</span>
+      </div>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon">◈</div>
+      <h3>Manual QA & Test Strategy</h3>
+      <p>End-to-end test planning, exploratory testing, regression strategy, and defect advocacy for complex multi-client healthcare and SaaS platforms. Clear documentation and traceable coverage.</p>
+      <div class="tag-list">
+        <span class="tag">Test Planning</span>
+        <span class="tag">Regression</span>
+        <span class="tag">E2E Testing</span>
+      </div>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon">⟳</div>
+      <h3>Test Automation</h3>
+      <p>Build or extend automation frameworks using Java, TestNG, and Selenium. From scratch framework development to CI/CD integration. AI-assisted development for faster delivery.</p>
+      <div class="tag-list">
+        <span class="tag">Java / TestNG</span>
+        <span class="tag">Selenium</span>
+        <span class="tag">CI/CD</span>
+      </div>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon">⬢</div>
+      <h3>API & Integration Testing</h3>
+      <p>REST, GraphQL, and SOAP API testing across regulated healthcare environments. Multi-tenant configurations, OAuth 2.0, and end-to-end data integrity validation.</p>
+      <div class="tag-list">
+        <span class="tag">REST / GraphQL</span>
+        <span class="tag">OAuth 2.0</span>
+        <span class="tag">HIPAA-aware</span>
+      </div>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon">◎</div>
+      <h3>Healthcare Domain QA</h3>
+      <p>Specialized expertise in insurance analytics, claims adjudication, credentialing, provider network management, EDI/X12 transactions, and federal health exchange compliance.</p>
+      <div class="tag-list">
+        <span class="tag">Insurance</span>
+        <span class="tag">Credentialing</span>
+        <span class="tag">EDI / X12</span>
+      </div>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon">⊕</div>
+      <h3>Software Development</h3>
+      <p>Custom software development and digitalization solutions for enterprise clients — delivered by an experienced engineering team. Scalable, cost-effective technology for growing businesses.</p>
+      <div class="tag-list">
+        <span class="tag">Custom Dev</span>
+        <span class="tag">Enterprise</span>
+        <span class="tag">Offshore Team</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-tag">Our Background</div>
+  <h2>Built on <span style="color:var(--teal)">Real-World</span><br>Healthcare Experience</h2>
+  <p class="section-sub">Our consulting practice is grounded in years of hands-on QA work across the most regulated sectors of US healthcare technology.</p>
+
+  <div class="experience-grid">
+
+    <!-- FEATURED: Dental AI -->
+    <div class="exp-card featured fade-up">
+      <div class="exp-content">
+        <div>
+          <span class="exp-label">AI Product QA — 4 Years</span>
+          <h3>Dental AI Insurance Platform</h3>
+          <p class="exp-meta">FDA-Cleared ML Platform  ·  Healthcare Insurance Technology</p>
+          <p>Served as the primary QA engineer responsible for validating an FDA-cleared dental AI platform's insurance product — a system that analyzes dental X-rays using computer vision and machine learning to support claims adjudication decisions for major US insurance carriers.</p>
+          <p>Core work involved verifying that AI model outputs — caries detection percentages, radiographic bone level measurements, and calculus identification — were correctly processed and applied against each payer's specific medical necessity logic trees to produce accurate accept, pend, or deny adjudication outcomes. Also performed rigorous DB and UI cross-validation to ensure data integrity between the AI processing layer and reviewer-facing interfaces.</p>
+          <div class="tag-list">
+            <span class="tag">AI / ML Validation</span>
+            <span class="tag">Claims Adjudication</span>
+            <span class="tag">Logic Tree Testing</span>
+            <span class="tag">DB + UI Cross-Validation</span>
+            <span class="tag">350+ CDT Codes</span>
+            <span class="tag">14+ Payer Implementations</span>
+          </div>
+        </div>
+        <div class="exp-highlights">
+          <div style="font-size:12px; font-weight:500; letter-spacing:0.15em; text-transform:uppercase; color:var(--teal); margin-bottom:16px;">Key Highlights</div>
+          <div class="highlight-item">Validated ML outputs (bone loss ratios, decay %, calculus detection) against payer-specific coverage thresholds</div>
+          <div class="highlight-item">Tested claims adjudication logic for 350+ CDT dental procedure codes across multiple enterprise payer configurations</div>
+          <div class="highlight-item">Designed 88 scenario-based claim linking test cases covering matching logic, eligibility windows, and multi-prior sequences</div>
+          <div class="highlight-item">Built complete automation framework from scratch as solo QA — 57+ test cases, CI/CD via Docker + GCP</div>
+          <div class="highlight-item">Identified critical production defects including blank provider attestation pages and clinically significant documentation discrepancies</div>
+          <div class="highlight-item">Used AI-assisted development (Cursor AI, Claude AI) to accelerate test design and framework delivery</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CMS Federal -->
+    <div class="exp-card fade-up">
+      <span class="exp-label">Federal Healthcare QA — 2+ Years</span>
+      <h3>CMS Federal Health Exchange</h3>
+      <p class="exp-meta">Centers for Medicare & Medicaid Services  ·  ManTech International</p>
+      <p>QA support for the Federal Exchanges Marketplace — one of the largest healthcare technology programs in the US. Covered the Data Services Hub, Electronic Data Interchange (EDI), Eligibility & Enrollment, Enhanced Direct Enrollment, and Special Enrollment Services.</p>
+      <div class="tag-list">
+        <span class="tag">CMS Marketplace</span>
+        <span class="tag">EDI / X12 / 834</span>
+        <span class="tag">Eligibility & Enrollment</span>
+        <span class="tag">SOAP / REST API</span>
+      </div>
+    </div>
+
+    <!-- Healthcare SaaS -->
+    <div class="exp-card fade-up">
+      <span class="exp-label">Healthcare SaaS QA</span>
+      <h3>Healthcare Platform & COVID App</h3>
+      <p class="exp-meta">Freelance via Toptal  ·  LabCorp / TekSystems</p>
+      <p>Delivered QA engineering for a healthcare SaaS platform (GCP, MongoDB, REST API) and the Mass COVID Vaccination Application by LabCorp — validating data accuracy, functional flows, and defect triage across Dev, UAT, and Production environments.</p>
+      <div class="tag-list">
+        <span class="tag">GCP</span>
+        <span class="tag">MongoDB</span>
+        <span class="tag">REST API</span>
+        <span class="tag">SQL Validation</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-visual">
+    <div class="about-card about-card-main">
+      <h3>What Sets Orbits Apart</h3>
+      <ul class="check-list">
+        <li>4 years as primary QA on an FDA-cleared dental AI insurance platform</li>
+        <li>Validated ML model outputs against medical necessity logic trees in production</li>
+        <li>Federal healthcare background — CMS Marketplace, EDI/X12/834 transactions</li>
+        <li>Experienced with HIPAA-regulated, multi-tenant enterprise healthcare systems</li>
+        <li>AI-assisted delivery using Cursor AI and Claude AI for faster, deeper coverage</li>
+        <li>Certified SAFe® Agilist — agile sprint integration as standard practice</li>
+        <li>US-based consulting backed by experienced offshore engineering capability</li>
+      </ul>
+    </div>
+    <div class="about-card about-card-accent">
+      <div class="accent-number">10+</div>
+      <p>Years of QA in regulated US healthcare — from federal exchanges to AI-powered dental insurance platforms</p>
+    </div>
+  </div>
+
+  <div class="about-content">
+    <div class="section-tag">About Orbits</div>
+    <h2>Quality Engineering<br>at the <span style="color:var(--teal)">Frontier</span></h2>
+    <p class="section-sub">We are a US-based technology consulting firm bringing senior QA expertise and engineering capability to healthcare, insurtech, and regulated SaaS companies.</p>
+    <p>Orbits was founded on a simple belief: that quality engineering in complex, regulated industries requires genuine domain expertise — not just test scripts. When you're validating AI models that inform clinical decisions, or testing federal health exchange infrastructure, generic QA simply isn't enough.</p>
+    <p>Our lead consultant brings over a decade of healthcare technology QA experience spanning AI-powered dental insurance platforms, federal CMS Marketplace programs, COVID response applications, and enterprise SaaS products. We combine rigorous manual test strategy with modern automation and AI-assisted tooling to deliver thorough, traceable coverage efficiently.</p>
+    <p>Backed by an experienced software engineering team, Orbits can scale from individual QA consulting engagements to full development projects — giving clients a single trusted partner for quality and technology.</p>
+    <a href="#contact" class="btn-primary" style="display:inline-block; margin-top: 16px;">Work With Us</a>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="section-tag">How We Work</div>
+  <h2>From Discovery<br>to <span style="color:var(--teal)">Delivery</span></h2>
+  <div class="process-steps">
+    <div class="step fade-up">
+      <div class="step-num">01</div>
+      <h3>Discovery</h3>
+      <p>We start by understanding your product, tech stack, domain, and quality gaps — no generic approaches, ever.</p>
+    </div>
+    <div class="step fade-up">
+      <div class="step-num">02</div>
+      <h3>Strategy</h3>
+      <p>Define test scope, coverage priorities, automation opportunities, and a risk-based testing approach tailored to your needs.</p>
+    </div>
+    <div class="step fade-up">
+      <div class="step-num">03</div>
+      <h3>Execution</h3>
+      <p>Deliver structured, traceable test coverage with clear documentation, actionable defect reports, and sprint collaboration.</p>
+    </div>
+    <div class="step fade-up">
+      <div class="step-num">04</div>
+      <h3>Scale</h3>
+      <p>Build reusable automation, CI/CD integration, and quality processes that grow with your team over time.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="contact-info">
+      <div class="section-tag">Get In Touch</div>
+      <h2>Let's Build<br><span style="color:var(--teal)">Together</span></h2>
+      <p>Whether you need a QA consultant for a sprint, a long-term quality partner, or a full engineering team — we'd love to hear about your project.</p>
+      <div class="contact-detail">
+        <div class="contact-item">
+          <div class="icon">@</div>
+          <span>hello@orbits-usa.com</span>
+        </div>
+        <div class="contact-item">
+          <div class="icon">⊕</div>
+          <span>orbits-usa.com</span>
+        </div>
+        <div class="contact-item">
+          <div class="icon">◎</div>
+          <span>Columbia, MD — Remote Worldwide</span>
+        </div>
+      </div>
+    </div>
+
+    <form class="contact-form" onsubmit="handleSubmit(event)">
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" placeholder="Jane Smith" required>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" placeholder="jane@company.com" required>
+      </div>
+      <div class="form-group">
+        <label>Service Needed</label>
+        <select>
+          <option value="">Select a service...</option>
+          <option>AI / ML Product Testing</option>
+          <option>Manual QA & Test Strategy</option>
+          <option>Test Automation</option>
+          <option>API & Integration Testing</option>
+          <option>Healthcare Domain QA</option>
+          <option>Software Development</option>
+          <option>Other / Not Sure</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tell Us About Your Project</label>
+        <textarea placeholder="Briefly describe your project, timeline, and what you're looking for..."></textarea>
+      </div>
+      <button type="submit" class="form-submit">Send Message →</button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="logo">
+    <div class="logo-orbit">
+      <svg viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="18" stroke="#00d4c8" stroke-width="1" stroke-dasharray="4 3" opacity="0.4"/>
+        <circle cx="20" cy="20" r="11" stroke="#00d4c8" stroke-width="1" opacity="0.6"/>
+        <circle cx="20" cy="20" r="4" fill="#00d4c8"/>
+        <circle cx="20" cy="9" r="2.5" fill="#00d4c8"/>
+      </svg>
+    </div>
+    ORBITS
+  </a>
+  <p>© 2026 Orbits LLC. All rights reserved. Columbia, MD.</p>
+  <ul class="footer-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</footer>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx - 5}px, ${my - 5}px)`;
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.transform = `translate(${rx - 18}px, ${ry - 18}px)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 100);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.form-submit');
+    btn.textContent = 'Message Sent ✓';
+    btn.style.background = '#00a89e';
+    setTimeout(() => {
+      btn.textContent = 'Send Message →';
+      btn.style.background = '';
+      e.target.reset();
+    }, 3000);
+  }
+
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    nav.style.borderBottomColor = window.scrollY > 60 ? 'rgba(0,212,200,0.15)' : 'rgba(0,212,200,0.08)';
+  });
+</script>
+</body>
+</html>
